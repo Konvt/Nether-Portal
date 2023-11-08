@@ -1,0 +1,11 @@
+dist/*
+build/*
+*.spec
+
+test/*
+
+*.log
+*.msi
+*.exe
+
+TODO
