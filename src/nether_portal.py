@@ -3,6 +3,7 @@
 # Copyright (c) 2023 Konvt
 
 import os
+import re
 import sys
 import logging
 import hashlib
@@ -87,6 +88,8 @@ def request_condition(request_mes: str, true_mes: str, false_mes: str, quit_flag
     condition_str = ''
     while len(condition_str) == 0 or condition_str[0] != 'y' or condition_str[0] != 'n':
         condition_str = input(f'{COL['CYAN']}{request_mes} [y/n]{COL['RESET']}\n>>> ').lower()
+        if len(condition_str) == 0:
+            continue
         if condition_str[0] == 'n':
             if quit_flag:
                 error_to_terminal(f'Quitting due to {false_mes}.')
@@ -94,7 +97,8 @@ def request_condition(request_mes: str, true_mes: str, false_mes: str, quit_flag
                 print(f'{COL['YEL']}{false_mes}.{COL['RESET']}')
             return False
         elif condition_str[0] == 'y':
-            print(true_mes)
+            if len(true_mes) > 0:
+                print(true_mes)
             return True
 
 ######################################## 以上是 Helper function ########################################
@@ -123,6 +127,17 @@ def check_file_exist(filename: str, path: str = '.') -> bool:
         if file == filename:
             return True
     return False
+
+# 检查是否已经存在 Java
+def check_java_version() -> str | None:
+    try:
+        cmd_ret = subprocess.check_output('java --version', shell=True).decode('utf-8')
+        version_str = re.search(r'java [^\s]+\d.*?(?=\s)', cmd_ret)
+        if version_str is not None:
+            return version_str.group().strip()
+    except Exception as e:
+        exception_logger(e, 'checking java version')
+    return None
 
 # 尝试下载文件
 def download_file(url: str, filename: None | str = None, path: str = '.') -> None:
@@ -158,7 +173,7 @@ def welcome(cli_arg: bool) -> None:
     )
     if VERSION.find('beta') == -1:
         print(
-            f'This is a open source program that helps {COL['GRE']}{FMT['BOLD']}Minecraft players{COL['RESET']} '
+            f'This is a open source program that helps novice {COL['GRE']}{FMT['BOLD']}Minecraft players{COL['RESET']} '
             'install the JDK environment with one click.\n'
         )
     else:
@@ -173,8 +188,24 @@ def welcome(cli_arg: bool) -> None:
         if cmd_str.find(HIDE_OPT) != -1:
             cli_arg = True
 
-    if cli_arg: # 上面重设过 cli_arg，这里不能使用 else
+    java_version = check_java_version()
+
+    if not cli_arg:
+        if java_version is not None:
+            request_condition(
+                f'You already have a java, the version is: "{COL['YEL']}{java_version}{COL['CYAN']}"\n' \
+                f'Are you still going to install the "{COL['YEL']}jdk-{jdk_version}{file_suffix}{COL['CYAN']}"?',
+                '',
+                f'already have a java version: "{java_version}"'
+            )
+        else:
+            print('Java not found.')
+    else:
         print(f'{COL['GRE']}Enable custom options.{COL['RESET']}')
+        if java_version is not None:
+            print(f'{COL['GRE']}The current java version is: "{COL['YEL']}{java_version}{COL['GRE']}"{COL['RESET']}')
+        else:
+            print('Java not found.')
 
         custom_jdk = input(
             f'{COL['CYAN']}What version of JDK do you want to install?\n'
