@@ -18,7 +18,7 @@ Nether Portal 提供了命令行界面（CLI），用于下载 JDK 安装文件�
 
 不需要使用额外的 Installer 安装这个工具.（开箱即用！）
 
-[点击这里下载](https://github.com/Konvt/Nether-Portal/releases/download/v0.0.1/nether_portal.exe)
+[点击这里下载](https://github.com/Konvt/Nether-Portal/releases/download/v0.0.2/nether_portal.exe)
 
 ## 如何使用？
 ### 如果已经下载了 JDK

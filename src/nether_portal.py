@@ -10,7 +10,7 @@ import hashlib
 import subprocess
 import urllib.request
 
-VERSION = 'v-beta.01'
+VERSION = 'v-0.0.2'
 
 FMT = { 'BOLD': '\033[1m' }
 COL = {
